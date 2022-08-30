@@ -34,8 +34,12 @@ gcode_t gcode_init(void) {
 gboolean gcode_parse_octoprint_line(gcode_t *state, gchar *buf)
 {
 	// Process only outgoing lines
-	char *gcode = strstr(buf, " Sent: ");
-	if (gcode == NULL) return FALSE;
+	char *gcode = strstr(buf, " Send: ");
+	if (gcode == NULL) {
+		// Report error only if it is not receive
+		char *recv = strstr(buf, " Recv: ");
+		return recv != NULL;
+	}
 	gcode += 7; // Length of the needle in strstr()
 
 	// First, check the command
