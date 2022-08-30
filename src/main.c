@@ -139,6 +139,8 @@ int main(int argc, char **argv)
 		// Wait for more
 		if (!log_reader_wait(&reader)) {
 			warnx("Log file was rotated or deleted, reopening");
+			// Give some magic seconds time to create a new file
+			sleep(3);
 			log_reader_reopen(&reader);
 		}
 	}
