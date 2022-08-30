@@ -51,6 +51,9 @@ gboolean gcode_parse_octoprint_line(gcode_t *state, gchar *buf)
 
 	if (command == NULL) {
 		return FALSE;
+	} else if (strcmp(command, "G28") == 0) {
+		// Return to home
+		state->x_pos = 0;
 	} else if (strcmp(command, "G90") == 0) {
 		// Absulute positioning
 		state->is_absolute = TRUE;
