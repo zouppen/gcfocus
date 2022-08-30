@@ -23,4 +23,5 @@ add_executable(gcfocus ${SRC_FILES})
 
 target_link_libraries(gcfocus PUBLIC
     PkgConfig::GLIB
+    m # math
 )

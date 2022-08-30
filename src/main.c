@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <glib.h>
 #include "log_reader.h"
+#include "gcode.h"
 #include "common.h"
 
 static gchar *from_bool(gboolean x);
@@ -95,14 +96,27 @@ int main(int argc, char **argv)
 	}
 
 	log_reader_t reader = log_reader_init(log_file);
+	gcode_t gcode_state = gcode_init();
 
 	// ugly read loop
 	while (TRUE) {
 		gchar *line;
 		// Get lines
 		while ((line = log_reader_try_getline(&reader)) != NULL) {
-			printf("DEBUG: got a line: %s\n", line);
+			if (!gcode_parse_octoprint_line(&gcode_state, line)) {
+				if (verbose) {
+					printf("Skipping garbage: %s...\n", line);
+				}
+			}
 		}
+
+		// Now we have got all input for this time, now it's
+		// time for lens adjustment.
+		printf("Coord: %f, absolute: %s\n", gcode_state.x_pos, from_bool(gcode_state.is_absolute));
+
+		// Time for conversion
+		long focus = round(convert_simple(gcode_state.x_pos));
+		printf("focus is: %ld\n", focus);
 
 		// Wait for more
 		if (!log_reader_wait(&reader)) {
