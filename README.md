@@ -32,11 +32,12 @@ See [calibration](calibration.md).
 
 ## Requirements
 
+- Linux
 - glib
 
 ## Status
 
-Work in progress
+In production at Hacklab Jyväskylä. Calibration might need some helper tool.
 
 ## Author
 
