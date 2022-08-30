@@ -1,6 +1,6 @@
 // Main module for gcfocus
 // SPDX-License-Identifier:   GPL-3.0-or-later
-// Copyright (C) 2021 Joel Lehtonen
+// Copyright (C) 2022 Joel Lehtonen
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,8 +22,10 @@
 #include <err.h>
 #include <errno.h>
 #include <glib.h>
+#include "log_reader.h"
 
 static gchar *from_bool(gboolean x);
+static gdouble convert_simple(gdouble x);
 
 static gchar *camera_dev = NULL;
 static gchar *log_file = NULL;
@@ -90,8 +92,17 @@ int main(int argc, char **argv)
 		       cal_b,
 		       cal_c);
 	}
-	
-	printf("TODO\n");
+
+	log_reader_t reader = init_log_reader(log_file);
+
+	// ugly read loop
+	while (TRUE) {
+		if (!wait_log_change(&reader)) {
+			// TODO try reopening it
+			errx(10, "Log file was rotated or deleted, quitting");
+		}
+		printf("DEBUG: got a line\n");
+	}
 	
 	return 0;
 }
@@ -100,4 +111,9 @@ int main(int argc, char **argv)
 static gchar *from_bool(gboolean x)
 {
 	return x ? "on" : "off";
+}
+
+// This function is passed to the actual workhorse.
+static gdouble convert_simple(gdouble x) {
+	return cal_a / (x + cal_b) + cal_c;
 }
