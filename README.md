@@ -24,7 +24,7 @@ the head is clean and not damaged.
 - Feed it to very simple G-code parser
 - Translate coordinate commands to absolute coordinates
 - Control manual focus of given V4L2 device using given lookup table
-- Truncate serial periodically from the beginning to save space
+- Truncate serial log periodically from the beginning to save space (TODO)
 
 # Calibration
 
