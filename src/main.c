@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <glib.h>
 #include "log_reader.h"
+#include "common.h"
 
 static gchar *from_bool(gboolean x);
 static gdouble convert_simple(gdouble x);
@@ -33,7 +34,7 @@ static gboolean log_truncate = FALSE;
 static gdouble cal_a = NAN;
 static gdouble cal_b = NAN;
 static gdouble cal_c = NAN;
-static gboolean verbose = FALSE;
+gboolean verbose = FALSE;
 
 static GOptionEntry entries[] =
 {

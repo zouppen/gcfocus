@@ -20,6 +20,7 @@
 #include <sys/inotify.h>
 #include <unistd.h>
 #include <glib.h>
+#include "common.h"
 #include "log_reader.h"
 
 log_reader_t init_log_reader(gchar *file)
@@ -118,7 +119,7 @@ gchar *try_getline(log_reader_t *reader)
 			return NULL;
 		case '\n':
 			// Finally! Rollbacking the buffer.
-			if (TRUE) {
+			if (verbose) {
 				printf("Ignored a too long input line\n");
 			}
 			reader->line_pos = 0;
