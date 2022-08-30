@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <stdio.h>
 #include <err.h>
 #include <sys/inotify.h>
 #include <unistd.h>
@@ -24,6 +25,13 @@
 log_reader_t init_log_reader(gchar *file)
 {
 	log_reader_t ret;
+
+	// Opening the file first to avoid triggering event for it
+	ret.log = fopen(file, "rb");
+	if (ret.log == NULL) {
+		err(2, "Unable to open log file %s", file);
+	}
+
 	ret.inotify_fd = inotify_init();
 	if (ret.inotify_fd == -1) {
 		err(2, "Unable to initialize inotify");
@@ -36,6 +44,9 @@ log_reader_t init_log_reader(gchar *file)
 	if (ret.watch_fd == -1) {
 		err(2, "Unable to watch %s", file);
 	}
+
+	// Buffer is empty initially
+	ret.line_pos = 0;
 
 	return ret;
 }
@@ -73,5 +84,50 @@ gboolean wait_log_change(log_reader_t *reader)
 		return FALSE;
 	default:
 		err(2, "Inotify gave inconsistent event %d", event.mask);
+	}
+}
+
+gchar *try_getline(log_reader_t *reader)
+{
+ omstart:
+	while (reader->line_pos < sizeof(reader->line_buf)) {
+		int c = fgetc(reader->log);
+		switch (c) {
+		case EOF:
+			// Gotta continue later
+			clearerr(reader->log);
+			return NULL;
+		case '\n':
+			// Terminate and return the string and rollback buffer
+			reader->line_buf[reader->line_pos] = '\0';
+			reader->line_pos = 0;
+			return reader->line_buf;
+		default:
+			// Store char
+			reader->line_buf[reader->line_pos++] = c;
+		}
+	}
+
+	// OK, we have overflown, ignore garbage until we get a new line
+	while (TRUE) {
+		int c = fgetc(reader->log);
+		switch (c) {
+		case EOF:
+			// Gotta continue later
+			clearerr(reader->log);
+			return NULL;
+		case '\n':
+			// Finally! Rollbacking the buffer.
+			if (TRUE) {
+				printf("Ignored a too long input line\n");
+			}
+			reader->line_pos = 0;
+
+			// Maybe tail recursion detection is working on gcc but
+			// doing still old fashioned way
+			goto omstart;
+		default:
+			// No action
+		}
 	}
 }

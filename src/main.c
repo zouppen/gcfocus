@@ -97,11 +97,17 @@ int main(int argc, char **argv)
 
 	// ugly read loop
 	while (TRUE) {
+		gchar *line;
+		// Get lines
+		while ((line = try_getline(&reader)) != NULL) {
+			printf("DEBUG: got a line: %s\n", line);
+		}
+
+		// Wait for more
 		if (!wait_log_change(&reader)) {
 			// TODO try reopening it
 			errx(10, "Log file was rotated or deleted, quitting");
 		}
-		printf("DEBUG: got a line\n");
 	}
 	
 	return 0;
