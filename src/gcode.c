@@ -44,6 +44,11 @@ gboolean gcode_parse_octoprint_line(gcode_t *state, gchar *buf)
 
 	// First, check the command
 	char *command = strsep(&gcode, " ");
+	if (command != NULL && *command == 'N') {
+		// Skip command number if it's there
+		command = strsep(&gcode, " ");
+	}
+
 	if (command == NULL) {
 		return FALSE;
 	} else if (strcmp(command, "G90") == 0) {
