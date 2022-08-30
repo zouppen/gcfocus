@@ -138,8 +138,8 @@ int main(int argc, char **argv)
 
 		// Wait for more
 		if (!log_reader_wait(&reader)) {
-			// TODO try reopening it
-			errx(10, "Log file was rotated or deleted, quitting");
+			warnx("Log file was rotated or deleted, reopening");
+			log_reader_reopen(&reader);
 		}
 	}
 	

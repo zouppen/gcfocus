@@ -23,7 +23,8 @@
 #include "common.h"
 #include "log_reader.h"
 
-// Internal reopen function to survive log rotation etc
+// Internal reopen function to survive log rotation etc. This doesn't
+// deallocate anything, use log_reader_reopen instead.
 static void log_reader_open(log_reader_t *reader);
 
 log_reader_t log_reader_init(gchar *file)
@@ -63,6 +64,19 @@ static void log_reader_open(log_reader_t *reader)
 
 	// Buffer is empty initially
 	reader->line_pos = 0;
+}
+
+void log_reader_reopen(log_reader_t *reader)
+{
+	// First, stop watching and close files
+	if (inotify_rm_watch(reader->inotify_fd, reader->watch_fd) != 0) {
+		err(2, "Unable to stop watching with inotify");
+	}
+	if (fclose(reader->log) != 0) {
+		err(2, "Unable to close old log file");
+	}
+	// Then, reopen all
+	log_reader_open(reader);
 }
 
 gboolean log_reader_wait(log_reader_t *reader)

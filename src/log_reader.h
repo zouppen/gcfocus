@@ -12,6 +12,10 @@ typedef struct {
 // Initializes log reader or dies with an error message
 log_reader_t log_reader_init(gchar *file);
 
+// Stop watching and reading old file and switch to new. Useful in log
+// rotation cases.
+void log_reader_reopen(log_reader_t *reader);
+
 // Wait log change. Returns TRUE if we got anything, FALSE if the file
 // faded away. Dies in case of inotify inconsistency.
 gboolean log_reader_wait(log_reader_t *reader);
