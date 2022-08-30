@@ -81,6 +81,7 @@ void log_reader_reopen(log_reader_t *reader)
 
 gboolean log_reader_wait(log_reader_t *reader)
 {
+ omstart:
 	// Fetch the event without file name
 	struct inotify_event event;
 	int got = read(reader->inotify_fd, &event, sizeof(event));
@@ -110,6 +111,11 @@ gboolean log_reader_wait(log_reader_t *reader)
 	case IN_DELETE_SELF:
 		// File was probably rotated
 		return FALSE;
+	case IN_IGNORED:
+		// This is triggered by log rotation watch
+		// clean-up. Not interesting since we already watch
+		// moves and deletes. Just skip and get a new.
+		goto omstart;
 	default:
 		err(2, "Inotify gave inconsistent event %d", event.mask);
 	}
