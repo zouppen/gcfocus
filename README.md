@@ -26,6 +26,10 @@ the head is clean and not damaged.
 - Control manual focus of given V4L2 device using given lookup table
 - Truncate serial periodically from the beginning to save space
 
+# Calibration
+
+See [calibration](calibration.md).
+
 ## Requirements
 
 - glib
