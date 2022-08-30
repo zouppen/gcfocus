@@ -1,6 +1,7 @@
 #pragma once
 
 typedef struct {
+	char *filename; // Allocated buffer
 	int inotify_fd;
 	int watch_fd;
 	FILE *log;

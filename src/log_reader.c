@@ -23,33 +23,46 @@
 #include "common.h"
 #include "log_reader.h"
 
+// Internal reopen function to survive log rotation etc
+static void log_reader_open(log_reader_t *reader);
+
 log_reader_t log_reader_init(gchar *file)
 {
 	log_reader_t ret;
-
-	// Opening the file first to avoid triggering event for it
-	ret.log = fopen(file, "rb");
-	if (ret.log == NULL) {
-		err(2, "Unable to open log file %s", file);
-	}
 
 	ret.inotify_fd = inotify_init();
 	if (ret.inotify_fd == -1) {
 		err(2, "Unable to initialize inotify");
 	}
 
-	ret.watch_fd = inotify_add_watch(ret.inotify_fd, file,
-					 IN_MODIFY |
-					 IN_DELETE_SELF |
-					 IN_MOVE_SELF);
-	if (ret.watch_fd == -1) {
-		err(2, "Unable to watch %s", file);
+	ret.filename = strdup(file);
+	if (ret.filename == NULL) {
+		err(2, "Unable to allocate memory for file name");
+	}
+	
+	log_reader_open(&ret);
+
+	return ret;
+}
+
+static void log_reader_open(log_reader_t *reader)
+{
+	// Opening the file first to avoid triggering event for it
+	reader->log = fopen(reader->filename, "rb");
+	if (reader->log == NULL) {
+		err(2, "Unable to open log file %s", reader->filename);
+	}
+	
+	reader->watch_fd = inotify_add_watch(reader->inotify_fd, reader->filename,
+					     IN_MODIFY |
+					     IN_DELETE_SELF |
+					     IN_MOVE_SELF);
+	if (reader->watch_fd == -1) {
+		err(2, "Unable to watch %s", reader->filename);
 	}
 
 	// Buffer is empty initially
-	ret.line_pos = 0;
-
-	return ret;
+	reader->line_pos = 0;
 }
 
 gboolean log_reader_wait(log_reader_t *reader)
