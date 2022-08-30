@@ -97,8 +97,9 @@ int main(int argc, char **argv)
 
 	log_reader_t reader = log_reader_init(log_file);
 	gcode_t gcode_state = gcode_init();
+	int last_focus = -1;
 
-	// ugly read loop
+	// Run this loop forever, once per incoming line chunk.
 	while (TRUE) {
 		gchar *line;
 		// Get lines
@@ -115,8 +116,24 @@ int main(int argc, char **argv)
 		printf("Coord: %f, absolute: %s\n", gcode_state.x_pos, from_bool(gcode_state.is_absolute));
 
 		// Time for conversion
-		long focus = round(convert_simple(gcode_state.x_pos));
-		printf("focus is: %ld\n", focus);
+		double focus = convert_simple(gcode_state.x_pos);
+		if (isnan(focus)) {
+			if (verbose) {
+				printf("Still confused about current coordinates\n");
+			}
+		} else {
+			int new_focus = focus;
+			if (new_focus != last_focus) {
+				// Adjust focus now
+				if (verbose) {
+					printf("Adjusting focus to: %d\n", new_focus);
+				}
+
+				// TODO actual adjustment
+
+				last_focus = new_focus;
+			}
+		}
 
 		// Wait for more
 		if (!log_reader_wait(&reader)) {
@@ -134,7 +151,7 @@ static gchar *from_bool(gboolean x)
 	return x ? "on" : "off";
 }
 
-// This function is passed to the actual workhorse.
+// Does the conversion described in calibration.md 
 static gdouble convert_simple(gdouble x) {
 	return cal_a / (x + cal_b) + cal_c;
 }
