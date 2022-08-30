@@ -7,8 +7,9 @@ Focus 3D printer or CNC machine camera based on X-axis position.
 In many cases it is difficult to use auto focus camera with 3D printer
 or CNC machines since the object and machine parts are tricking the
 automatic focus algorithm in cameras. Manual focus works better but
-it's not optimal since if the camera is attached near the head of the
-machine.
+it's not optimal if the camera is attached near the head of the
+machine and it's difficult to find a focus point which works for the
+whole working range.
 
 Since X position is given in the G-code it's rather straightforward to
 parse the position from there, we could set the focus of the camera
