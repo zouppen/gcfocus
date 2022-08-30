@@ -26,7 +26,7 @@ the head is clean and not damaged.
 - Control manual focus of given V4L2 device using given lookup table
 - Truncate serial log periodically from the beginning to save space (TODO)
 
-# Calibration
+## Calibration
 
 See [calibration](calibration.md).
 
@@ -34,6 +34,24 @@ See [calibration](calibration.md).
 
 - Linux
 - glib
+- cmake
+
+## Building
+
+Install dependencies. In Debian based systems for example:
+
+```sh
+sudo apt install cmake libglib2.0-dev
+```
+
+And build:
+
+```sh
+mkdir build
+cd build
+cmake ..
+```
+
 
 ## Status
 
