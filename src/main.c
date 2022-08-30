@@ -94,18 +94,18 @@ int main(int argc, char **argv)
 		       cal_c);
 	}
 
-	log_reader_t reader = init_log_reader(log_file);
+	log_reader_t reader = log_reader_init(log_file);
 
 	// ugly read loop
 	while (TRUE) {
 		gchar *line;
 		// Get lines
-		while ((line = try_getline(&reader)) != NULL) {
+		while ((line = log_reader_try_getline(&reader)) != NULL) {
 			printf("DEBUG: got a line: %s\n", line);
 		}
 
 		// Wait for more
-		if (!wait_log_change(&reader)) {
+		if (!log_reader_wait(&reader)) {
 			// TODO try reopening it
 			errx(10, "Log file was rotated or deleted, quitting");
 		}

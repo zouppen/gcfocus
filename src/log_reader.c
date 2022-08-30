@@ -23,7 +23,7 @@
 #include "common.h"
 #include "log_reader.h"
 
-log_reader_t init_log_reader(gchar *file)
+log_reader_t log_reader_init(gchar *file)
 {
 	log_reader_t ret;
 
@@ -52,7 +52,7 @@ log_reader_t init_log_reader(gchar *file)
 	return ret;
 }
 
-gboolean wait_log_change(log_reader_t *reader)
+gboolean log_reader_wait(log_reader_t *reader)
 {
 	// Fetch the event without file name
 	struct inotify_event event;
@@ -88,7 +88,7 @@ gboolean wait_log_change(log_reader_t *reader)
 	}
 }
 
-gchar *try_getline(log_reader_t *reader)
+gchar *log_reader_try_getline(log_reader_t *reader)
 {
  omstart:
 	while (reader->line_pos < sizeof(reader->line_buf)) {
