@@ -22,6 +22,7 @@
 #include <err.h>
 #include <errno.h>
 #include <glib.h>
+#include "camera.h"
 #include "log_reader.h"
 #include "gcode.h"
 #include "common.h"
@@ -95,6 +96,7 @@ int main(int argc, char **argv)
 		       cal_c);
 	}
 
+	camera_t camera = camera_init(camera_dev);
 	log_reader_t reader = log_reader_init(log_file);
 	gcode_t gcode_state = gcode_init();
 	int last_focus = -1;
@@ -129,8 +131,7 @@ int main(int argc, char **argv)
 					printf("Adjusting focus to: %d\n", new_focus);
 				}
 
-				// TODO actual adjustment
-
+				camera_set_focus(&camera, new_focus);
 				last_focus = new_focus;
 			}
 		}
