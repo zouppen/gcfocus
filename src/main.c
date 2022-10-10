@@ -25,7 +25,6 @@
 #include "camera.h"
 #include "log_reader.h"
 #include "gcode.h"
-#include "common.h"
 
 static gchar *from_bool(gboolean x);
 static gdouble convert_simple(gdouble x);
