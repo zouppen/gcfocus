@@ -114,9 +114,11 @@ int main(int argc, char **argv)
 
 		// Now we have got all input for this time, now it's
 		// time for lens adjustment.
-		printf("Coord: %f, absolute: %s\n", gcode_state.x_pos, from_bool(gcode_state.is_absolute));
+		if (verbose) {
+			printf("Coord: %f, absolute: %s\n", gcode_state.x_pos, from_bool(gcode_state.is_absolute));
+		}
 
-		// Time for conversion
+		// Convert x position to lens focus value
 		double focus = convert_simple(gcode_state.x_pos);
 		if (isnan(focus)) {
 			if (verbose) {
